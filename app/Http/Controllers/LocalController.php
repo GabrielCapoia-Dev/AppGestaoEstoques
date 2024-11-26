@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Estoque;
 use App\Models\Local;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -81,7 +82,6 @@ class LocalController extends Controller
         ], 201);
     }
 
-
     /**
      * Retorna um local especifico
      */
@@ -108,7 +108,8 @@ class LocalController extends Controller
      */
     public function update(Request $request, Local $local)
     {
-        $validator = Validator::make($request->all(),
+        $validator = Validator::make(
+            $request->all(),
             [
                 'nome_local' => 'required|string|min:2|max:30',
                 'status_local' => 'required|string|in:Ativo,Inativo',
@@ -142,9 +143,11 @@ class LocalController extends Controller
             'message' => 'Local atualizado com sucesso.',
             'local' => $local
         ], 200);
-                
     }
 
+    /**
+     * Desativa o local
+     */
     public function desativarLocal($id)
     {
         $local = Local::find($id);
@@ -165,6 +168,10 @@ class LocalController extends Controller
         ], 200);
     }
 
+
+    /**
+     * Ativa o local
+     */
     public function ativarLocal($id)
     {
         $local = Local::find($id);
@@ -186,4 +193,26 @@ class LocalController extends Controller
     }
 
 
+    /**
+     * Retorna os estoques do local
+     */
+    public function visualizarEstoquesDoLocal($id)
+    {
+        $local = Local::find($id);
+
+        if (!$local) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Local não encontrado.'
+            ], 404);
+        }
+
+        $estoque = Estoque::where('id_local', $local->id)->get();
+        
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoques do local encontrados.',
+            'estoque' => $estoque
+        ], 200);
+    }
 }
