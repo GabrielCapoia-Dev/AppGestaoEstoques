@@ -1,23 +1,24 @@
 <?php
 
-namespace Database\Seeders;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-
-class DatabaseSeeder extends Seeder
+class CreateUsuariosLocaisTable extends Migration
 {
-    /**
-     * Seed the application's database.
-     */
-    public function run(): void
+    public function up()
     {
-        // User::factory(10)->create();
+        Schema::create('usuarios_locais', function (Blueprint $table) {
+            $table->integer('id_usuario')->unsigned();
+            $table->integer('id_local')->unsigned();
+            $table->primary(['id_usuario', 'id_local']);
+            $table->foreign('id_usuario')->references('id')->on('usuarios');
+            $table->foreign('id_local')->references('id')->on('locais');
+        });
+    }
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+    public function down()
+    {
+        Schema::dropIfExists('usuarios_locais');
     }
 }
