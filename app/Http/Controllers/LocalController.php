@@ -96,10 +96,13 @@ class LocalController extends Controller
             ], 404);
         }
 
+        $endereco = EnderecoController::show($local->id_endereco);
+
         return response()->json([
             'error' => false,
             'message' => 'Local encontrado.',
-            'local' => $local
+            'local' => $local,
+            'endereco' => $endereco
         ], 200);
     }
 

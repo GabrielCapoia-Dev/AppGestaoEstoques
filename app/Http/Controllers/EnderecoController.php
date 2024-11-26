@@ -3,18 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Endereco;
+use App\Models\Local;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class EnderecoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * O endereço deve ser static pois quando o local é criado o endereço também deve ser criado junto
@@ -74,11 +68,22 @@ class EnderecoController extends Controller
 
 
     /**
-     * Display the specified resource.
+     * Retorna o endereço de um local especifico
      */
-    public function show(Endereco $endereco)
+    public static function show($id_local)
     {
-        //
+        $local = Local::find($id_local);
+
+        if(!$local) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Local não encontrado.'
+            ], 404);
+        }
+
+        $enderecos = $local->enderecos()->get();
+
+        return  $enderecos;
     }
 
     /**
