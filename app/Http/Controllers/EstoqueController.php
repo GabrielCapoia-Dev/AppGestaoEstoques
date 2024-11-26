@@ -13,7 +13,20 @@ class EstoqueController extends Controller
      */
     public function index()
     {
-        //
+        $estoque = Estoque::all();
+
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Nenhum estoque encontrado.'
+            ], 404);
+        }
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoques encontrados.',
+            'estoque' => $estoque
+        ], 200);
     }
 
     /**
@@ -25,7 +38,7 @@ class EstoqueController extends Controller
             $request->all(),
             [
                 'nome_estoque' => 'required|string|min:2|max:30',
-                'descricao' => 'required|string|min:2|max:255',
+                'descricao_estoque' => 'required|string|min:2|max:255',
             ],
             [
                 'required' => 'O campo :attribute é obrigatório.',
@@ -37,7 +50,7 @@ class EstoqueController extends Controller
             ],
             [
                 'nome_estoque' => 'Nome Estoque',
-                'descricao' => 'Descricao',
+                'descricao_estoque' => 'Descricao Estoque',
             ]
         );
 
@@ -52,8 +65,8 @@ class EstoqueController extends Controller
 
         $estoque = Estoque::create([
             'nome_estoque' => $request->nome_estoque,
-            'status' => 'Ativo', // O estoque é criado automaticamente com status Ativo
-            'descricao' => $request->descricao
+            'status_estoque' => 'Ativo', // O estoque é criado automaticamente com status Ativo
+            'descricao_estoque' => $request->descricao_estoque
         ]);
 
         return $estoque;
@@ -62,17 +75,78 @@ class EstoqueController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Estoque $estoque)
+    public function show($id)
     {
-        //
+        $estoque = Estoque::find($id);
+
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Estoque nao encontrado.'
+            ], 404);
+        }    
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoque encontrado.',
+            'estoque' => $estoque
+        ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Estoque $estoque)
+    public function update(Request $request, $id)
     {
-        //
+        $estoque = Estoque::find($id);
+
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Estoque nao encontrado.'
+            ], 404);
+        }
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'nome_estoque' => 'required|string|min:2|max:30',
+                'descricao_estoque' => 'required|string|min:2|max:255',
+                'status_estoque' => 'required|string|in:Ativo,Inativo',
+            ],
+            [
+                'required' => 'O campo :attribute é obrigatório.',
+                'exists' => 'O campo :attribute nao existe.',
+                'string' => 'O campo :attribute deve ser uma string.',
+                'in' => 'O campo :attribute deve ser "Ativo" ou "Inativo".',
+                'min' => 'O campo :attribute deve ter no mínimo :min caracteres.',
+                'max' => 'O campo :attribute deve ter no máximo :max caracteres.',
+            ],
+            [
+                'nome_estoque' => 'Nome Estoque',
+                'status_estoque' => 'Status Estoque',
+                'descricao_estoque' => 'Descricao Estoque',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Dados inválidos.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $estoque->nome_estoque = $request->nome_estoque;
+        $estoque->status = $request->status;
+        $estoque->descricao = $request->descricao;
+        $estoque->save();
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoque atualizado com sucesso.',
+            'estoque' => $estoque
+        ], 200);
     }
 
 }

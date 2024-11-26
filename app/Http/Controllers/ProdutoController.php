@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
+use App\Models\Estoque;
 use App\Models\NotificacaoProduto;
 use App\Models\Produto;
 use Illuminate\Http\Request;
@@ -249,6 +250,35 @@ class ProdutoController extends Controller
             'error' => false,
             'message' => 'Produtos encontrados da categoria: ' . $categoria->nome,
             'produtos' => $produtos
+        ], 200);
+    }
+
+    /**
+     * Valida se o estoque foi inativado, se sim inativar todos os produtos
+     */
+    public function inativarEstoque($id)
+    {
+        $estoque = Estoque::find($id);
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Estoque não encontrado.'
+            ], 404);
+        }
+
+        if ($estoque->status == 'Inativo') {
+            $produtos = Produto::where('id_estoque', $id)->get();
+            foreach ($produtos as $produto) {
+                $produto->update([
+                    'status' => 'Inativo'
+                ]);
+            }
+        }
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoque inativado com sucesso.',
+            'estoque' => $estoque
         ], 200);
     }
 }

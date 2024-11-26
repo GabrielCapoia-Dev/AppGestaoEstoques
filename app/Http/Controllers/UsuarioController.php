@@ -297,11 +297,53 @@ class UsuarioController extends Controller
     }
 
     /** 
-     * Visualiza usuarios listados por permissao
+     * Lista todos os usuarios ativos por permissao
      */
     public function visualizarUsuariosPorPermissao($permissao)
     {
-        $usuarios = Usuario::where('permissao', $permissao)->get();
+        $usuarios = Usuario::where('status_usuario', 'Ativo')->where('permissao', $permissao)->get();
+
+        if (!$usuarios) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Nenhum usuário encontrado.'
+            ], 404);
+        }
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Usuários encontrados.',
+            'usuarios' => $usuarios
+        ]);
+    }
+
+    /** 
+     * Visualizar todos os usuarios ativos
+     */
+    public function visualizarUsuariosAtivos()
+    {
+        $usuarios = Usuario::where('status_usuario', 'Ativo')->get();
+
+        if (!$usuarios) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Nenhum usuário encontrado.'
+            ], 404);
+        }
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Usuários encontrados.',
+            'usuarios' => $usuarios
+        ]);
+    }
+
+    /**
+     * Visualizar todos os usuarios inativos
+     */
+    public function visualizarUsuariosInativos()
+    {
+        $usuarios = Usuario::where('status_usuario', 'Inativo')->get();
 
         if (!$usuarios) {
             return response()->json([
