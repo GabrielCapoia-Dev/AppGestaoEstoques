@@ -256,7 +256,7 @@ class ProdutoController extends Controller
     /**
      * Valida se o estoque foi inativado, se sim inativar todos os produtos
      */
-    public function inativarEstoque($id)
+    public function estoqueInativadoInativarProdutos($id)
     {
         $estoque = Estoque::find($id);
         if (!$estoque) {
@@ -278,6 +278,35 @@ class ProdutoController extends Controller
         return response()->json([
             'error' => false,
             'message' => 'Estoque inativado com sucesso.',
+            'estoque' => $estoque
+        ], 200);
+    }
+
+    /**
+     * Valida se o estoque foi ativado, se sim ativar todos os produtos
+     */
+    public function estoqueAtivadoAtivarProdutos($id)
+    {
+        $estoque = Estoque::find($id);
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Estoque não encontrado.'
+            ], 404);
+        }
+
+        if ($estoque->status == 'Ativo') {
+            $produtos = Produto::where('id_estoque', $id)->get();
+            foreach ($produtos as $produto) {
+                $produto->update([
+                    'status' => 'Ativo'
+                ]);
+            }
+        }
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoque ativado com sucesso.',
             'estoque' => $estoque
         ], 200);
     }
