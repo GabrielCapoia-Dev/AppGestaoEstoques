@@ -256,7 +256,7 @@ class ProdutoController extends Controller
     /**
      * Valida se o estoque foi inativado, se sim inativar todos os produtos
      */
-    public function estoqueInativadoInativarProdutos($id)
+    public static function estoqueInativadoInativarProdutos($id)
     {
         $estoque = Estoque::find($id);
         if (!$estoque) {
@@ -285,7 +285,7 @@ class ProdutoController extends Controller
     /**
      * Valida se o estoque foi ativado, se sim ativar todos os produtos
      */
-    public function estoqueAtivadoAtivarProdutos($id)
+    public static function estoqueAtivadoAtivarProdutos($id)
     {
         $estoque = Estoque::find($id);
         if (!$estoque) {

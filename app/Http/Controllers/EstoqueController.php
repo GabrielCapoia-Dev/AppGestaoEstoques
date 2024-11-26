@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 class EstoqueController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Retorna todos os estoques
      */
     public function index()
     {
@@ -73,7 +73,7 @@ class EstoqueController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Retorna um estoque especifico
      */
     public function show($id)
     {
@@ -84,7 +84,7 @@ class EstoqueController extends Controller
                 'error' => true,
                 'message' => 'Estoque nao encontrado.'
             ], 404);
-        }    
+        }
 
         return response()->json([
             'error' => false,
@@ -94,7 +94,7 @@ class EstoqueController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Atualiza o estoque
      */
     public function update(Request $request, $id)
     {
@@ -149,4 +149,59 @@ class EstoqueController extends Controller
         ], 200);
     }
 
+
+    /**
+     * Inativa o estoque e os produtos presentes nele
+     */
+
+    public function desativarEstoque($id)
+    {
+        $estoque = Estoque::find($id);
+
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Estoque nao encontrado.'
+            ], 404);
+        }
+
+        $estoque->status_estoque = 'Inativo';
+        $estoque->save();
+
+        $inativaProduto = ProdutoController::estoqueInativadoInativarProdutos($id);
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoque desativado com sucesso.',
+            'estoque' => $estoque,
+            'produtos' => $inativaProduto
+        ], 200);
+    }
+
+
+    /**
+     * Ativa o estoque e os produtos presentes nele
+     */
+    public function ativarEstoque($id)
+    {
+        $estoque = Estoque::find($id);
+
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Estoque nao encontrado.'
+            ], 404);
+        }    
+
+        $estoque->status_estoque = 'Ativo';
+        $estoque->save();
+
+        $ativaProduto = ProdutoController::estoqueAtivadoAtivarProdutos($id);
+        
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoque ativado com sucesso.',
+            'estoque' => $estoque,
+            'produtos' => $ativaProduto
+        ], 200);
+    }
 }
