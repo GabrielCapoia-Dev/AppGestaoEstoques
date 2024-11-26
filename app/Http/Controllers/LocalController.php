@@ -165,7 +165,25 @@ class LocalController extends Controller
         ], 200);
     }
 
-    
+    public function ativarLocal($id)
+    {
+        $local = Local::find($id);
+
+        if (!$local) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Local não encontrado.'
+            ], 404);
+        }
+
+        $local->status_local = 'Ativo';
+        $local->save();
+        return response()->json([
+            'error' => false,
+            'message' => 'Local ativado com sucesso.',
+            'local' => $local
+        ], 200);
+    }
 
 
 }
