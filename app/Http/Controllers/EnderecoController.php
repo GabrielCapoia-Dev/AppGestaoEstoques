@@ -17,14 +17,6 @@ class EnderecoController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * O endereço deve ser static pois quando o local é criado o endereço também deve ser criado junto
      */
     public static function store(Request $request)
@@ -77,11 +69,7 @@ class EnderecoController extends Controller
         ], 200);
 
 
-        return response()->json([
-            'error' => false,
-            'message' => 'Endereço criado com sucesso.',
-            'endereco' => $endereco
-        ], 200);
+        return  $endereco;
     }
 
 
@@ -94,14 +82,6 @@ class EnderecoController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Endereco $endereco)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Endereco $endereco)
@@ -109,11 +89,4 @@ class EnderecoController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Endereco $endereco)
-    {
-        //
-    }
 }

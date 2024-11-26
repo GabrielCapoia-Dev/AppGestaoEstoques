@@ -56,25 +56,13 @@ class EstoqueController extends Controller
             'descricao' => $request->descricao
         ]);
 
-        return response()->json([
-            'error' => false,
-            'message' => 'Estoque criado com sucesso.',
-            'estoque' => $estoque,
-        ], 200);
+        return $estoque;
     }
 
     /**
      * Display the specified resource.
      */
     public function show(Estoque $estoque)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Estoque $estoque)
     {
         //
     }
@@ -87,11 +75,4 @@ class EstoqueController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Estoque $estoque)
-    {
-        //
-    }
 }

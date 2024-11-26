@@ -251,7 +251,7 @@ class UsuarioController extends Controller
     /**
      * Desabilita o usuário
      */
-    public function desable($id)
+    public function desativarUsuario($id)
     {
         $usuario = Usuario::find($id);
         if (!$usuario) {
@@ -275,7 +275,7 @@ class UsuarioController extends Controller
     /**
      * Habilita o usuário
      */
-    public function enable($id)
+    public function ativarUsuario($id)
     {
         $usuario = Usuario::find($id);
         if (!$usuario) {
@@ -299,7 +299,7 @@ class UsuarioController extends Controller
     /** 
      * Visualiza usuarios listados por permissao
      */
-    public function showAllByPermission($permissao)
+    public function visualizarUsuariosPorPermissao($permissao)
     {
         $usuarios = Usuario::where('permissao', $permissao)->get();
 

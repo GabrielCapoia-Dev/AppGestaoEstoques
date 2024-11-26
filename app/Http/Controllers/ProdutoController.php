@@ -178,7 +178,7 @@ class ProdutoController extends Controller
     /**
      * Desabilita o produto
      */
-    public function desable($id)
+    public function desativarProduto($id)
     {
         $produto = Produto::find($id);
         if (!$produto) {
@@ -202,7 +202,7 @@ class ProdutoController extends Controller
     /**
      * Habilita o produto
      */
-    public function enable($id)
+    public function ativarProduto($id)
     {
         $produto = Produto::find($id);
         if (!$produto) {
@@ -227,7 +227,7 @@ class ProdutoController extends Controller
     /**
      * Listar todos os produtos de uma categoria
      */
-    public function showAllByCategory($id)
+    public function visualizarProdutosPorCategoria($id)
     {
         $categoria = Categoria::find($id);
         if (!$categoria) {

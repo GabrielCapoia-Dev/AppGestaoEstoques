@@ -14,7 +14,7 @@ class NotificacaoProdutoController extends Controller
     {
         $notificacaoProduto = NotificacaoProduto::all();
 
-        if(!$notificacaoProduto) {
+        if (!$notificacaoProduto) {
             return response()->json([
                 'error' => true,
                 'message' => 'Nenhum item encontrado.'
@@ -26,7 +26,6 @@ class NotificacaoProdutoController extends Controller
             'message' => 'Itens encontrados.',
             'notificacao' => $notificacaoProduto
         ], 200);
-
     }
 
     /**
@@ -35,7 +34,7 @@ class NotificacaoProdutoController extends Controller
     public static function store(Request $request)
     {
         $notificacaoProduto = NotificacaoProduto::create([
-            'id_produto' => $request->id_produto,	
+            'id_produto' => $request->id_produto,
             'visualizado' => 'Não',
             'mensagem' => 'O produto ' . $request->nome . ' foi alterado.'
         ], 200);
@@ -89,4 +88,19 @@ class NotificacaoProdutoController extends Controller
         ], 200);
     }
 
+
+    /**
+     *  Visualizar a quantidade de notificações nao visualizadas
+     */
+
+    public function quantidadeNotificacoesNaoVisualizadas()
+    {
+        $quantidade = NotificacaoProduto::where('visualizado', 'Não')->count();
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Quantidade de notificação nao visualizadas.',
+            'notificacoes' => $quantidade
+        ], 200);
+    }
 }
