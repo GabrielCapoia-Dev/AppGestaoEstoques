@@ -138,13 +138,14 @@ class LocalController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-
+        $endereco = EnderecoController::update($request, $local->id_endereco);
         $local->update($request->all());
 
         return response()->json([
             'error' => false,
             'message' => 'Local atualizado com sucesso.',
-            'local' => $local
+            'local' => $local,
+            'endereco' => $endereco
         ], 200);
     }
 
@@ -197,9 +198,9 @@ class LocalController extends Controller
 
 
     /**
-     * Retorna os estoques do local
+     * Retorna os estoques ativos do local
      */
-    public function visualizarEstoquesDoLocal($id)
+    public function visualizarEstoquesAtivosDoLocal($id)
     {
         $local = Local::find($id);
 
@@ -210,12 +211,35 @@ class LocalController extends Controller
             ], 404);
         }
 
-        $estoque = Estoque::where('id_local', $local->id)->get();
-        
+        $estoques = $local->estoques()->where('status', 'Ativo')->get();
+
         return response()->json([
             'error' => false,
-            'message' => 'Estoques do local encontrados.',
-            'estoque' => $estoque
+            'message' => 'Estoques ativos do local.',
+            'estoques' => $estoques
+        ], 200);
+    }
+
+    /**
+     * Visualizar estoques inativos do local
+     */
+    public function visualizarEstoquesInativosDoLocal($id)
+    {
+        $local = Local::find($id);
+
+        if (!$local) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Local não encontrado.'
+            ], 404);
+        }
+
+        $estoques = $local->estoques()->where('status', 'Inativo')->get();
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoques inativos do local.',
+            'estoques' => $estoques
         ], 200);
     }
 }

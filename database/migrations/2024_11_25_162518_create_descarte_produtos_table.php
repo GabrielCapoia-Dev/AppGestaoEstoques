@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('descarte_produtos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_produto')->constrained('produtos')->onDelete('cascade');
-            $table->string('status_descarte');
+            $table->string('vencimento_descarte');
+            $table->string('data_vencimento_descarte');
+            $table->string('defeito_descarte');
             $table->string('descricao_descarte');
             $table->string('quantidade_descarte');
                 $table->timestamps();

@@ -196,7 +196,7 @@ class EstoqueController extends Controller
         $estoque->save();
 
         $ativaProduto = ProdutoController::estoqueAtivadoAtivarProdutos($id);
-        
+
         return response()->json([
             'error' => false,
             'message' => 'Estoque ativado com sucesso.',
@@ -204,4 +204,6 @@ class EstoqueController extends Controller
             'produtos' => $ativaProduto
         ], 200);
     }
+
+    
 }

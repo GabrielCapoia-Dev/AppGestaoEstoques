@@ -12,7 +12,9 @@ class DescarteProduto extends Model
 
     protected $fillable = [
         'id_produto',
-        'status_descarte',
+        'vencimento_descarte',
+        'data_vencimento_descarte',
+        'defeito_descarte',
         'descricao_descarte',
         'quantidade_descarte',
     ];

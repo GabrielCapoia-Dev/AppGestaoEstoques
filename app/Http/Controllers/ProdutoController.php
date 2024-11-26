@@ -126,6 +126,7 @@ class ProdutoController extends Controller
 
         $validator = Validator::make($request->all(), [
             'id_categoria' => 'required|exists:categorias,id',
+            'id_estoque' => 'required|exists:estoques,id',
             'nome' => 'required|string|min:2|max:30',
             'status' => 'required|string|in:Ativo,Inativo',
             'descricao' => 'required|string|min:2|max:255',
@@ -143,6 +144,7 @@ class ProdutoController extends Controller
             'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
         ], [
             'id_categoria' => 'Categoria',
+            'id_estoque' => 'Estoque',
             'nome' => 'Nome',
             'status' => 'Status',
             'descricao' => 'Descrição',
@@ -308,6 +310,35 @@ class ProdutoController extends Controller
             'error' => false,
             'message' => 'Estoque ativado com sucesso.',
             'estoque' => $estoque
+        ], 200);
+    }
+
+    /**
+     * Funcao estatica para visualizar todos os produtos ativos de um estoque
+     */
+    public static function visualizarProdutosAtivos($id_estoque)
+    {
+        $estoque = Estoque::find($id_estoque);
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Estoque não encontrado.'
+            ], 404);
+        }
+
+        $produtos = Produto::where('id_estoque', $id_estoque)->where('status', 'Ativo')->get();
+
+        if (!$produtos) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Nenhum produto encontrado.'
+            ], 404);
+        }
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Produtos encontrados do estoque: ' . $estoque->nome,
+            'produtos' => $produtos
         ], 200);
     }
 }
