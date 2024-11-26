@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_endereco')->constrained('enderecos')->onDelete('cascade');
             $table->foreignId('id_estoque')->constrained('estoques')->onDelete('cascade');
-            $table->string('nome');
-            $table->string('status');
+            $table->string('nome_local');
+            $table->string('status_local');
             $table->timestamps();
         });
     }

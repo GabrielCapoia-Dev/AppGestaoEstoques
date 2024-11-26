@@ -34,8 +34,8 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|min:5|max:30',
-            'email' => [
+            'name_usuario' => 'required|string|min:5|max:30',
+            'email_usuario' => [
                 'required',
                 'email',
                 'unique:usuarios',
@@ -79,7 +79,7 @@ class UsuarioController extends Controller
             ],
             'confirmaSenha' => 'required|same:password',
             'permissao' => 'required|in:Administrador,subAdmin,Gestores,Secretaria,Cozinha,Serviços Gerais',
-            'status' => 'required|in:Ativo,Inativo'
+            'status_usuario' => 'required|in:Ativo,Inativo'
         ], [
             'required' => 'O campo :attribute é obrigatório.',
             'min' => 'O campo :attribute deve conter pelo menos :min caracteres.',
@@ -89,12 +89,12 @@ class UsuarioController extends Controller
             'same' => 'O campo :attribute deve ser igual ao campo :other.',
             'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
         ], [
-            'name' => 'Nome',
-            'email' => 'E-mail',
+            'name_usuario' => 'Nome do Usuário',
+            'email_usuario' => 'E-mail do Usuário',
             'senha' => 'Senha',
             'confirmaSenha' => 'Confirmar Senha',
             'permissao' => 'Permissão',
-            'status' => 'Status'
+            'status_usuario' => 'Status do Usuário'
         ]);
 
         if ($validator->fails()) {
@@ -106,11 +106,11 @@ class UsuarioController extends Controller
         }
 
         $usuario = Usuario::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name_usuario' => $request->name_usuario,
+            'email_usuario' => $request->email_usuario,
             'senha' => bcrypt($request->senha),
             'permissao' => $request->permissao,
-            'status' => $request->status
+            'status_usuario' => $request->status_usuario
         ]);
 
 
@@ -155,69 +155,74 @@ class UsuarioController extends Controller
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|min:5|max:30',
-            'email' => [
-                'required',
-                'email',
-                'unique:usuarios',
-                function ($attribute, $value, $fail) {
-                    // Verifica se o e-mail contém espaços em branco
-                    if (strpos($value, ' ') !== false) {
-                        $fail('O campo :attribute não pode conter espaços em branco.');
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name_usuario' => 'required|string|min:5|max:30',
+                'email_usuario' => [
+                    'required',
+                    'email',
+                    'unique:usuarios',
+                    function ($attribute, $value, $fail) {
+                        // Verifica se o e-mail contém espaços em branco
+                        if (strpos($value, ' ') !== false) {
+                            $fail('O campo :attribute não pode conter espaços em branco.');
+                        }
+                        // Verifica se o e-mail contém o símbolo '@'
+                        if (strpos($value, '@') === false) {
+                            $fail('O campo :attribute deve conter o símbolo @.');
+                        }
+                        // Verifica se o e-mail contém pelo menos um ponto '.'
+                        if (strpos($value, '.') === false) {
+                            $fail('O campo :attribute deve conter um ponto (.)');
+                        }
                     }
-                    // Verifica se o e-mail contém o símbolo '@'
-                    if (strpos($value, '@') === false) {
-                        $fail('O campo :attribute deve conter o símbolo @.');
+                ],
+                'senha' => [
+                    'required',
+                    'string',
+                    'min:7',
+                    function ($attribute, $value, $fail) {
+                        // Verifica maiusculas
+                        if (!preg_match('/[A-Z]/', $value)) {
+                            $fail("A password deve conter pelo menos uma letra maiúscula.");
+                        }
+                        // Verifica minusculas
+                        if (!preg_match('/[a-z]/', $value)) {
+                            $fail("A password deve conter pelo menos uma letra minúscula.");
+                        }
+                        // Verifica os numericos
+                        if (!preg_match('/\d/', $value)) {
+                            $fail("A password deve conter pelo menos um número.");
+                        }
+                        // Verifica caracteres especiais
+                        if (!preg_match('/[@$!%*?&]/', $value)) {
+                            $fail("A password deve conter pelo menos um caractere especial.");
+                        }
                     }
-                    // Verifica se o e-mail contém pelo menos um ponto '.'
-                    if (strpos($value, '.') === false) {
-                        $fail('O campo :attribute deve conter um ponto (.)');
-                    }
-                }
+                ],
+                'confirmaSenha' => 'required|same:password',
+                'permissao' => 'required|in:Administrador,subAdmin,Gestores,Secretaria,Cozinha,Serviços Gerais',
+                'status_usuario' => 'required|in:Ativo,Inativo'
             ],
-            'senha' => [
-                'required',
-                'string',
-                'min:7',
-                function ($attribute, $value, $fail) {
-                    // Verifica maiusculas
-                    if (!preg_match('/[A-Z]/', $value)) {
-                        $fail("A password deve conter pelo menos uma letra maiúscula.");
-                    }
-                    // Verifica minusculas
-                    if (!preg_match('/[a-z]/', $value)) {
-                        $fail("A password deve conter pelo menos uma letra minúscula.");
-                    }
-                    // Verifica os numericos
-                    if (!preg_match('/\d/', $value)) {
-                        $fail("A password deve conter pelo menos um número.");
-                    }
-                    // Verifica caracteres especiais
-                    if (!preg_match('/[@$!%*?&]/', $value)) {
-                        $fail("A password deve conter pelo menos um caractere especial.");
-                    }
-                }
+            [
+                'required' => 'O campo :attribute é obrigatório.',
+                'min' => 'O campo :attribute deve conter pelo menos :min caracteres.',
+                'max' => 'O campo :attribute deve conter no máximo :max caracteres.',
+                'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
+                'unique' => 'O campo :attribute deve ser único.',
+                'same' => 'O campo :attribute deve ser igual ao campo :other.',
+                'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
             ],
-            'confirmaSenha' => 'required|same:password',
-            'permissao' => 'required|in:Administrador,subAdmin,Gestores,Secretaria,Cozinha,Serviços Gerais',
-            'status' => 'required|in:Ativo,Inativo'
-        ], [
-            'required' => 'O campo :attribute é obrigatório.',
-            'min' => 'O campo :attribute deve conter pelo menos :min caracteres.',
-            'max' => 'O campo :attribute deve conter no máximo :max caracteres.',
-            'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
-            'unique' => 'O campo :attribute deve ser único.',
-            'same' => 'O campo :attribute deve ser igual ao campo :other.',
-            'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
-        ], [
-            'name' => 'Nome',
-            'email' => 'E-mail',
-            'senha' => 'Senha',
-            'confirmaSenha' => 'Confirmar Senha',
-            'permissao' => 'Permissão',
-            'status' => 'Status'
-        ]);
+            [
+                'name_usuario' => 'Nome de Usuário',
+                'email_usuario' => 'E-mail de Usuário',
+                'senha' => 'Senha',
+                'confirmaSenha' => 'Confirmar Senha',
+                'permissao' => 'Permissão',
+                'status_usuario' => 'Status de Usuário'
+            ]
+        );
 
         if ($validator->fails()) {
             return response()->json([
@@ -229,11 +234,11 @@ class UsuarioController extends Controller
 
 
         $usuario->update([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name_usuario' => $request->name_usuario,
+            'email_usuario' => $request->email_usuario,
             'senha' => bcrypt($request->senha),
             'permissao' => $request->permissao,
-            'status' => $request->status
+            'status_usuario' => $request->status_usuario
         ]);
 
         return response()->json([
@@ -257,7 +262,7 @@ class UsuarioController extends Controller
         }
 
         $usuario->update([
-            'status' => 'Inativo'
+            'status_usuario' => 'Inativo'
         ]);
 
         return response()->json([
@@ -272,7 +277,7 @@ class UsuarioController extends Controller
      */
     public function enable($id)
     {
-        $usuario = Usuario::find($id);  
+        $usuario = Usuario::find($id);
         if (!$usuario) {
             return response()->json([
                 'error' => true,
@@ -281,7 +286,7 @@ class UsuarioController extends Controller
         }
 
         $usuario->update([
-            'status' => 'Ativo'
+            'status_usuario' => 'Ativo'
         ]);
 
         return response()->json([

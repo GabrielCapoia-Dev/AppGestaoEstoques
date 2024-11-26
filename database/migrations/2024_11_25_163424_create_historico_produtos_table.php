@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('historico_produtos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_produto')->constrained('produtos')->onDelete('cascade');
-            $table->string('nome');
-            $table->string('status');
-            $table->string('descricao');
+            $table->string('nome_produto');
+            $table->string('status_produto');
+            $table->string('descricao_produto');
             $table->string('preco')->nullable();
             $table->string('quantidade_atual');
             $table->string('quantidade_minima');

@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_categoria')->constrained('categorias')->onDelete('cascade');
             $table->foreignId('id_estoque')->constrained('estoques')->onDelete('cascade');
-            $table->string('nome');
-            $table->string('status');
-            $table->string('descricao');
+            $table->string('nome_produto');
+            $table->string('status_produto');
+            $table->string('descricao_produto');
             $table->string('preco')->nullable();
             $table->string('quantidade_atual');
             $table->string('quantidade_minima');

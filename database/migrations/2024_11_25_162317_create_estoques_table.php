@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('estoques', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
-            $table->string('status');
-            $table->integer('descricao');
+            $table->string('nome_estoque');
+            $table->string('status_estoque');
+            $table->integer('descricao_estoque');
             $table->timestamps();
         });
     }

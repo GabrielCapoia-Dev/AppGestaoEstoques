@@ -35,35 +35,40 @@ class ProdutoController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'id_categoria' => 'required|exists:categorias,id',
-            'id_estoque' => 'required|exists:estoques,id',
-            'nome' => 'required|string|min:2|max:30',
-            'status' => 'required|string|in:Ativo,Inativo',
-            'descricao' => 'required|string|min:2|max:255',
-            'preco' => 'required|numeric|min:0.01',
-            'quantidade_atual' => 'required|numeric|min:0',
-            'quantidade_minima' => 'required|numeric|min:0',
-            'quantidade_maxima' => 'required|numeric|min:0',
-        ], [
-            'required' => 'O campo :attribute é obrigatório.',
-            'exists' => 'O campo :attribute não existe.',
-            'string' => 'O campo :attribute deve ser uma string.',
-            'min' => 'O campo :attribute deve ter no mínimo :min caracteres.',
-            'max' => 'O campo :attribute deve ter no máximo :max caracteres.',
-            'numeric' => 'O campo :attribute deve ser um número.',
-            'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
-        ], [
-            'id_categoria' => 'Categoria',
-            'id_estoque' => 'Estoque',
-            'nome' => 'Nome',
-            'status' => 'Status',
-            'descricao' => 'Descrição',
-            'preco' => 'Preço',
-            'quantidade_atual' => 'Quantidade Atual',
-            'quantidade_minima' => 'Quantidade Mínima',
-            'quantidade_maxima' => 'Quantidade Máxima',
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'id_categoria' => 'required|exists:categorias,id',
+                'id_estoque' => 'required|exists:estoques,id',
+                'nome_produto' => 'required|string|min:2|max:30',
+                'status_produto' => 'required|string|in:Ativo,Inativo',
+                'descricao_produto' => 'required|string|min:2|max:255',
+                'preco' => 'required|numeric|min:0.01',
+                'quantidade_atual' => 'required|numeric|min:0',
+                'quantidade_minima' => 'required|numeric|min:0',
+                'quantidade_maxima' => 'required|numeric|min:0',
+            ],
+            [
+                'required' => 'O campo :attribute é obrigatório.',
+                'exists' => 'O campo :attribute não existe.',
+                'string' => 'O campo :attribute deve ser uma string.',
+                'min' => 'O campo :attribute deve ter no mínimo :min caracteres.',
+                'max' => 'O campo :attribute deve ter no máximo :max caracteres.',
+                'numeric' => 'O campo :attribute deve ser um número.',
+                'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
+            ],
+            [
+                'id_categoria' => 'Categoria',
+                'id_estoque' => 'Estoque',
+                'nome_produto' => 'Nome Produto',
+                'status_produto' => 'Status Produto',
+                'descricao_produto' => 'Descrição Produto',
+                'preco' => 'Preço',
+                'quantidade_atual' => 'Quantidade Atual',
+                'quantidade_minima' => 'Quantidade Mínima',
+                'quantidade_maxima' => 'Quantidade Máxima',
+            ]
+        );
 
         if ($validator->fails()) {
             return response()->json([
@@ -96,7 +101,7 @@ class ProdutoController extends Controller
                 'error' => true,
                 'message' => 'Nenhum produto encontrado.'
             ], 404);
-        }    
+        }
 
         return response()->json([
             'error' => false,
@@ -110,7 +115,7 @@ class ProdutoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $produto = Produto::find($id);  
+        $produto = Produto::find($id);
         if (!$produto) {
             return response()->json([
                 'error' => true,
@@ -168,7 +173,6 @@ class ProdutoController extends Controller
             'message' => 'Produto atualizado com sucesso.',
             'produto' => $produto
         ], 200);
-
     }
 
     /**
@@ -176,7 +180,7 @@ class ProdutoController extends Controller
      */
     public function desable($id)
     {
-        $produto = Produto::find($id);  
+        $produto = Produto::find($id);
         if (!$produto) {
             return response()->json([
                 'error' => true,
@@ -186,13 +190,13 @@ class ProdutoController extends Controller
 
         $produto->update([
             'status' => 'Inativo'
-        ]); 
+        ]);
 
         return response()->json([
             'error' => false,
             'message' => 'Produto desabilitado com sucesso.',
             'produto' => $produto
-        ], 200); 
+        ], 200);
     }
 
     /**
@@ -200,7 +204,7 @@ class ProdutoController extends Controller
      */
     public function enable($id)
     {
-        $produto = Produto::find($id);  
+        $produto = Produto::find($id);
         if (!$produto) {
             return response()->json([
                 'error' => true,
@@ -210,13 +214,13 @@ class ProdutoController extends Controller
 
         $produto->update([
             'status' => 'Ativo'
-        ]); 
+        ]);
 
         return response()->json([
             'error' => false,
             'message' => 'Produto habilitado com sucesso.',
             'produto' => $produto
-        ], 200); 
+        ], 200);
     }
 
 

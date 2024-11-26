@@ -10,9 +10,9 @@ class Estoque extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nome',
-        'status',
-        'descricao',
+        'nome_estoque',
+        'status_estoque',
+        'descricao_estoque',
     ];
 
 }

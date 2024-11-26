@@ -34,13 +34,11 @@ class HistoricoProdutoController extends Controller
      */
     public static function store(Request $request)
     {
-        
-
         $historico = new HistoricoProduto();
         $historico->id_produto = $request->id_produto;
-        $historico->nome = $request->nome;
-        $historico->status = $request->status;
-        $historico->descricao = $request->descricao;
+        $historico->nome_produto = $request->nome_produto;
+        $historico->status_produto = $request->status_produto;
+        $historico->descricao_produto = $request->descricao_produto;
         $historico->preco = $request->preco;
         $historico->quantidade_atual = $request->quantidade_atual;
         $historico->quantidade_minima = $request->quantidade_minima;

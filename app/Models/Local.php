@@ -12,8 +12,8 @@ class Local extends Model
     protected $fillable = [
         'id_endereco',
         'id_estoque',
-        'nome',
-        'status',
+        'nome_local',
+        'status_local',
     ];
 
     public function endereco()

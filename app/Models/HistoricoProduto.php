@@ -11,9 +11,9 @@ class HistoricoProduto extends Model
 
     protected $fillable = [
         'id_produto',
-        'nome',
-        'status',
-        'descricao',
+        'nome_produto',
+        'status_produto',
+        'descricao_produto',
         'preco',
         'quantidade_atual',
         'quantidade_minima',

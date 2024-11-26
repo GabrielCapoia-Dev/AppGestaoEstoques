@@ -24,7 +24,7 @@ class EstoqueController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'status' => 'required|string|in:Ativo,Inativo',
+                'nome_estoque' => 'required|string|min:2|max:30',
                 'descricao' => 'required|string|min:2|max:255',
             ],
             [
@@ -36,7 +36,7 @@ class EstoqueController extends Controller
                 'max' => 'O campo :attribute deve ter no máximo :max caracteres.',
             ],
             [
-                'status' => 'Status',
+                'nome_estoque' => 'Nome Estoque',
                 'descricao' => 'Descricao',
             ]
         );
@@ -51,8 +51,8 @@ class EstoqueController extends Controller
         }
 
         $estoque = Estoque::create([
-            'id_produto' => $request->id_produto,
-            'status' => $request->status,
+            'nome_estoque' => $request->nome_estoque,
+            'status' => 'Ativo', // O estoque é criado automaticamente com status Ativo
             'descricao' => $request->descricao
         ]);
 
