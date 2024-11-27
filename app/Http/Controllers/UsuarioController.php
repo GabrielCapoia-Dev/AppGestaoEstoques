@@ -81,7 +81,7 @@ class UsuarioController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name_usuario' => 'required|string|min:5|max:30',
+                'nome_usuario' => 'required|string|min:5|max:30',
                 'email_usuario' => [
                     'required',
                     'email',
@@ -124,9 +124,8 @@ class UsuarioController extends Controller
                         }
                     }
                 ],
-                'confirmaSenha' => 'required|same:password',
+                'confirmaSenha' => 'required|same:senha',
                 'permissao' => 'required|in:Administrador,subAdmin,Gestão,Secretaria,Cozinha,Serviços Gerais',
-                'status_usuario' => 'required|in:Ativo,Inativo'
             ],
             [
                 'required' => 'O campo :attribute é obrigatório.',
@@ -138,12 +137,11 @@ class UsuarioController extends Controller
                 'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
             ],
             [
-                'name_usuario' => 'Nome do Usuário',
+                'nome_usuario' => 'Nome do Usuário',
                 'email_usuario' => 'E-mail do Usuário',
                 'senha' => 'Senha',
                 'confirmaSenha' => 'Confirmar Senha',
                 'permissao' => 'Permissão',
-                'status_usuario' => 'Status do Usuário'
             ]
         );
 
@@ -156,11 +154,11 @@ class UsuarioController extends Controller
         }
 
         $usuario = Usuario::create([
-            'name_usuario' => $request->name_usuario,
+            'nome_usuario' => $request->nome_usuario,
             'email_usuario' => $request->email_usuario,
             'senha' => bcrypt($request->senha),
             'permissao' => $sobrescreverPermissao ?: $request->permissao,
-            'status_usuario' => $request->status_usuario
+            'status_usuario' => 'Ativo'
         ]);
 
 
@@ -208,7 +206,7 @@ class UsuarioController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name_usuario' => 'required|string|min:5|max:30',
+                'nome_usuario' => 'required|string|min:5|max:30',
                 'email_usuario' => [
                     'required',
                     'email',
@@ -244,8 +242,8 @@ class UsuarioController extends Controller
                         }
                     }
                 ],
-                'confirmaSenha' => 'nullable|same:senha', // Não obrigatório se a senha não foi alterada
-                'permissao' => 'required|in:subAdmin,Gestão,Secretaria,Cozinha,Serviços Gerais',
+                'confirmaSenha' => 'nullable|same:senha',
+                'permissao' => 'nullable|in:Administrador,subAdmin,Gestão,Secretaria,Cozinha,Serviços Gerais',
                 'status_usuario' => 'required|in:Ativo,Inativo'
             ],
             [
@@ -258,7 +256,7 @@ class UsuarioController extends Controller
                 'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
             ],
             [
-                'name_usuario' => 'Nome de Usuário',
+                'nome_usuario' => 'Nome de Usuário',
                 'email_usuario' => 'E-mail de Usuário',
                 'senha' => 'Senha',
                 'confirmaSenha' => 'Confirmar Senha',
@@ -272,12 +270,12 @@ class UsuarioController extends Controller
                 'error' => true,
                 'message' => 'Erro ao atualizar usuário.',
                 'errors' => $validator->errors()
-            ], 400);
+            ], 422);
         }
 
         // Atualiza os dados do usuário
         $usuario->update([
-            'name_usuario' => $request->name_usuario,
+            'nome_usuario' => $request->nome_usuario,
             'email_usuario' => $request->email_usuario,
             'senha' => $request->senha ? bcrypt($request->senha) : $usuario->senha,
             'permissao' => $sobrescreverPermissao ?: $request->permissao,
@@ -344,7 +342,7 @@ class UsuarioController extends Controller
      */
     public function visualizarUsuariosPorPermissao($permissao)
     {
-        if($permissao == 'Administrador'){
+        if ($permissao == 'Administrador') {
             return response()->json([
                 'error' => true,
                 'message' => 'Nenhum usuário encontrado.'
@@ -372,7 +370,7 @@ class UsuarioController extends Controller
      */
     public function visualizarUsuariosAtivos()
     {
-    
+
 
         $usuarios = Usuario::where('status_usuario', 'Ativo')->where('permissao', '!=', 'Administrador')->get();
 

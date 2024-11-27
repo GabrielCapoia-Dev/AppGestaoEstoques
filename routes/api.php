@@ -10,23 +10,24 @@ use App\Http\Controllers\LocalController;
 use App\Http\Controllers\NotificacaoProdutoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\DescarteProdutoController;
+use App\Http\Controllers\HistoricoProdutoController;
+
+Route::prefix('admin')->group(function () {
+    Route::post('/criar', [AdministradorController::class, 'adminCriar']);
+    Route::put('/editar/{id}', [AdministradorController::class, 'editarAdmin']);
+
+    Route::put('/desativar/{id}', [AdministradorController::class, 'desativarAdmin']);
+    Route::put('/ativar/{id}', [AdministradorController::class, 'ativarAdmin']);
+
+    Route::get('/listar/ativos', [AdministradorController::class, 'visualizarAdministradoresAtivos']);
+    Route::get('/listar/inativos', [AdministradorController::class, 'visualizarAdministradoresInativos']);
+
+    Route::get('/listar', [AdministradorController::class, 'listarComAdmin']);
+    Route::get('/listar/{id}', [AdministradorController::class, 'showAdmin']);
+});
 
 //Rota exclusivas do admin
 Route::middleware(['auth:jwt', 'permissao:Administrador'])->group(function () {
-
-    Route::prefix('admin')->group(function () {
-        Route::post('/criar', [AdministradorController::class, 'adminCriar']);
-        Route::put('/editar/{id}', [UsuarioController::class, 'editaAdmin']);
-
-        Route::put('/desativar/{id}', [AdministradorController::class, 'desativarAdmin']);
-        Route::put('/ativar/{id}', [AdministradorController::class, 'ativarAdmin']);
-
-        Route::get('/listar/ativos', [AdministradorController::class, 'visualizarAdministradoresAtivos']);
-        Route::get('/listar/inativos', [AdministradorController::class, 'visualizarAdministradoresInativos']);
-
-        Route::get('/listar', [AdministradorController::class, 'listarComAdmin']);
-        Route::get('/listar/{id}', [AdministradorController::class, 'showAdmin']);
-    });
 
     Route::prefix('produtos')->group(function () {
         Route::post('/criar', [ProdutoController::class, 'store']);
@@ -100,12 +101,12 @@ Route::middleware(['auth:jwt', 'permissao:Administrador'])->group(function () {
     });
 
     Route::prefix('historicos')->group(function () {
-        Route::post('/listar/tudo/{id}', [HistoricoController::class, 'visuzalizarHistoricoDeProduto']);
-        Route::get('/listar', [HistoricoController::class, 'index']);
-        Route::get('/listar/{id}', [HistoricoController::class, 'show']);
+        Route::post('/listar/tudo/{id}', [HistoricoProdutoController::class, 'visuzalizarHistoricoDeProduto']);
+        Route::get('/listar', [HistoricoProdutoController::class, 'index']);
+        Route::get('/listar/{id}', [HistoricoProdutoController::class, 'show']);
     });
 
-    Route::prefix('descartes')->group(function () {    
+    Route::prefix('descartes')->group(function () {
         Route::post('/criar', [DescarteProdutoController::class, 'store']);
         Route::get('/listar', [DescarteProdutoController::class, 'index']);
         Route::get('/listar/{id}', [DescarteProdutoController::class, 'show']);
