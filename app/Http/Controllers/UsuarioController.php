@@ -4,16 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UsuarioController extends Controller
 {
+
+    /**
+     * Realiza o login e athentica o usuário com base na sua permissao
+     * se a permissao for admin, o usuário é redirecionado para a pagina de administrador
+     */
+    public function login(Request $request)
+    {
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'email_usuario' => 'required|email',
+                'senha' => 'required|string|min:7'
+            ],
+            [
+                'required' => 'O campo :attribute é obrigatório.',
+                'email' => 'O campo :attribute deve ser um e-mail.',
+            ],
+            [
+                'email_usuario' => 'E-mail',
+                'senha' => 'Senha'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => true,
+                'message' => $validator->errors()->first()
+            ], 400);
+        }
+
+
+
+        $usuario = Usuario::where('email_usuario', $request->email_usuario)->first();
+
+        if (!$usuario || !Hash::check($request->senha, $usuario->password)) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Credenciais inválidas.'
+            ], 401);
+        }
+    }
+
     /**
      * Retorna todos os usuarios
      */
-    public function index()
+    public function listarSemAdmin()
     {
-        $usuarios = Usuario::all();
+        $usuarios = Usuario::where('permissao', '!=', 'Administrador')->get();
         if (!$usuarios) {
             return response()->json([
                 'error' => true,
@@ -30,131 +74,10 @@ class UsuarioController extends Controller
 
     /**
      * Cria um novo usuário
+     * Acesso especifico para o Administradores e SubAdministradores
      */
-    public function store(Request $request)
+    public static function store(Request $request, $sobrescreverPermissao = null)
     {
-        $validator = Validator::make($request->all(), [
-            'name_usuario' => 'required|string|min:5|max:30',
-            'email_usuario' => [
-                'required',
-                'email',
-                'unique:usuarios',
-                function ($attribute, $value, $fail) {
-                    // Verifica se o e-mail contém espaços em branco
-                    if (strpos($value, ' ') !== false) {
-                        $fail('O campo :attribute não pode conter espaços em branco.');
-                    }
-                    // Verifica se o e-mail contém o símbolo '@'
-                    if (strpos($value, '@') === false) {
-                        $fail('O campo :attribute deve conter o símbolo @.');
-                    }
-                    // Verifica se o e-mail contém pelo menos um ponto '.'
-                    if (strpos($value, '.') === false) {
-                        $fail('O campo :attribute deve conter um ponto (.)');
-                    }
-                }
-            ],
-            'senha' => [
-                'required',
-                'string',
-                'min:7',
-                function ($attribute, $value, $fail) {
-                    // Verifica maiusculas
-                    if (!preg_match('/[A-Z]/', $value)) {
-                        $fail("A password deve conter pelo menos uma letra maiúscula.");
-                    }
-                    // Verifica minusculas
-                    if (!preg_match('/[a-z]/', $value)) {
-                        $fail("A password deve conter pelo menos uma letra minúscula.");
-                    }
-                    // Verifica os numericos
-                    if (!preg_match('/\d/', $value)) {
-                        $fail("A password deve conter pelo menos um número.");
-                    }
-                    // Verifica caracteres especiais
-                    if (!preg_match('/[@$!%*?&]/', $value)) {
-                        $fail("A password deve conter pelo menos um caractere especial.");
-                    }
-                }
-            ],
-            'confirmaSenha' => 'required|same:password',
-            'permissao' => 'required|in:Administrador,subAdmin,Gestores,Secretaria,Cozinha,Serviços Gerais',
-            'status_usuario' => 'required|in:Ativo,Inativo'
-        ], [
-            'required' => 'O campo :attribute é obrigatório.',
-            'min' => 'O campo :attribute deve conter pelo menos :min caracteres.',
-            'max' => 'O campo :attribute deve conter no máximo :max caracteres.',
-            'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
-            'unique' => 'O campo :attribute deve ser único.',
-            'same' => 'O campo :attribute deve ser igual ao campo :other.',
-            'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
-        ], [
-            'name_usuario' => 'Nome do Usuário',
-            'email_usuario' => 'E-mail do Usuário',
-            'senha' => 'Senha',
-            'confirmaSenha' => 'Confirmar Senha',
-            'permissao' => 'Permissão',
-            'status_usuario' => 'Status do Usuário'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => true,
-                'message' => 'Erro ao cadastrar usuário.',
-                'errors' => $validator->errors()
-            ], 400);
-        }
-
-        $usuario = Usuario::create([
-            'name_usuario' => $request->name_usuario,
-            'email_usuario' => $request->email_usuario,
-            'senha' => bcrypt($request->senha),
-            'permissao' => $request->permissao,
-            'status_usuario' => $request->status_usuario
-        ]);
-
-
-        return response()->json([
-            'error' => false,
-            'message' => 'Usuário cadastrado com sucesso.',
-            'usuario' => $usuario
-        ], 201);
-    }
-
-    /**
-     * Retorna o usuario selecionado
-     */
-    public function show($id)
-    {
-        $usuario = Usuario::find($id);
-        if (!$usuario) {
-            return response()->json([
-                'error' => true,
-                'message' => 'Usuário não encontrado.'
-            ], 404);
-        }
-
-        return response()->json([
-            'error' => false,
-            'message' => 'Usuário encontrado.',
-            'usuario' => $usuario
-        ], 200);
-    }
-
-    /**
-     * Edita as informações do usuário
-     */
-    public function update(Request $request, $id)
-    {
-        $usuario = Usuario::find($id);
-
-        if (!$usuario) {
-            return response()->json([
-                'error' => true,
-                'message' => 'Usuário não encontrado.'
-            ], 404);
-        }
-
         $validator = Validator::make(
             $request->all(),
             [
@@ -202,7 +125,7 @@ class UsuarioController extends Controller
                     }
                 ],
                 'confirmaSenha' => 'required|same:password',
-                'permissao' => 'required|in:Administrador,subAdmin,Gestores,Secretaria,Cozinha,Serviços Gerais',
+                'permissao' => 'required|in:Administrador,subAdmin,Gestão,Secretaria,Cozinha,Serviços Gerais',
                 'status_usuario' => 'required|in:Ativo,Inativo'
             ],
             [
@@ -215,12 +138,12 @@ class UsuarioController extends Controller
                 'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
             ],
             [
-                'name_usuario' => 'Nome de Usuário',
-                'email_usuario' => 'E-mail de Usuário',
+                'name_usuario' => 'Nome do Usuário',
+                'email_usuario' => 'E-mail do Usuário',
                 'senha' => 'Senha',
                 'confirmaSenha' => 'Confirmar Senha',
                 'permissao' => 'Permissão',
-                'status_usuario' => 'Status de Usuário'
+                'status_usuario' => 'Status do Usuário'
             ]
         );
 
@@ -232,18 +155,138 @@ class UsuarioController extends Controller
             ], 400);
         }
 
-
-        $usuario->update([
+        $usuario = Usuario::create([
             'name_usuario' => $request->name_usuario,
             'email_usuario' => $request->email_usuario,
             'senha' => bcrypt($request->senha),
-            'permissao' => $request->permissao,
+            'permissao' => $sobrescreverPermissao ?: $request->permissao,
+            'status_usuario' => $request->status_usuario
+        ]);
+
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Usuário cadastrado com sucesso.',
+            'usuario' => $usuario
+        ], 201);
+    }
+
+    /**
+     * Retorna o usuario selecionado é possivel ver todos os usuarios exceto Admin
+     */
+    public function show($id)
+    {
+        $usuario = Usuario::find($id);
+        if (!$usuario || $usuario->permissao == 'Administrador') {
+            return response()->json([
+                'error' => true,
+                'message' => 'Usuário não encontrado.'
+            ], 404);
+        }
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Usuário encontrado.',
+            'usuario' => $usuario
+        ], 200);
+    }
+
+    /**
+     * Edita as informações do usuário padrão, o admin e subAdmin tem acesso
+     */
+    public static function update(Request $request, $id, $sobrescreverPermissao = null)
+    {
+        $usuario = Usuario::find($id);
+
+        if (!$usuario) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Usuário não encontrado.'
+            ], 404);
+        }
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name_usuario' => 'required|string|min:5|max:30',
+                'email_usuario' => [
+                    'required',
+                    'email',
+                    'unique:usuarios,email_usuario,' . $id, // Exclui o email do próprio usuário no "unique"
+                    function ($attribute, $value, $fail) {
+                        if (strpos($value, ' ') !== false) {
+                            $fail('O campo :attribute não pode conter espaços em branco.');
+                        }
+                        if (strpos($value, '@') === false) {
+                            $fail('O campo :attribute deve conter o símbolo @.');
+                        }
+                        if (strpos($value, '.') === false) {
+                            $fail('O campo :attribute deve conter um ponto (.)');
+                        }
+                    }
+                ],
+                'senha' => [
+                    'nullable', // Não obrigatório ao atualizar
+                    'string',
+                    'min:7',
+                    function ($attribute, $value, $fail) {
+                        if ($value && !preg_match('/[A-Z]/', $value)) {
+                            $fail("A senha deve conter pelo menos uma letra maiúscula.");
+                        }
+                        if ($value && !preg_match('/[a-z]/', $value)) {
+                            $fail("A senha deve conter pelo menos uma letra minúscula.");
+                        }
+                        if ($value && !preg_match('/\d/', $value)) {
+                            $fail("A senha deve conter pelo menos um número.");
+                        }
+                        if ($value && !preg_match('/[@$!%*?&]/', $value)) {
+                            $fail("A senha deve conter pelo menos um caractere especial.");
+                        }
+                    }
+                ],
+                'confirmaSenha' => 'nullable|same:senha', // Não obrigatório se a senha não foi alterada
+                'permissao' => 'required|in:subAdmin,Gestão,Secretaria,Cozinha,Serviços Gerais',
+                'status_usuario' => 'required|in:Ativo,Inativo'
+            ],
+            [
+                'required' => 'O campo :attribute é obrigatório.',
+                'min' => 'O campo :attribute deve conter pelo menos :min caracteres.',
+                'max' => 'O campo :attribute deve conter no máximo :max caracteres.',
+                'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
+                'unique' => 'O campo :attribute deve ser único.',
+                'same' => 'O campo :attribute deve ser igual ao campo :other.',
+                'in' => 'O campo :attribute deve ser um dos seguintes valores: :values.',
+            ],
+            [
+                'name_usuario' => 'Nome de Usuário',
+                'email_usuario' => 'E-mail de Usuário',
+                'senha' => 'Senha',
+                'confirmaSenha' => 'Confirmar Senha',
+                'permissao' => 'Permissão',
+                'status_usuario' => 'Status de Usuário'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Erro ao atualizar usuário.',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        // Atualiza os dados do usuário
+        $usuario->update([
+            'name_usuario' => $request->name_usuario,
+            'email_usuario' => $request->email_usuario,
+            'senha' => $request->senha ? bcrypt($request->senha) : $usuario->senha,
+            'permissao' => $sobrescreverPermissao ?: $request->permissao,
             'status_usuario' => $request->status_usuario
         ]);
 
         return response()->json([
             'error' => false,
-            'message' => 'Usuário editado com sucesso.',
+            'message' => 'Usuário editado com sucesso.',
             'usuario' => $usuario
         ], 200);
     }
@@ -254,7 +297,7 @@ class UsuarioController extends Controller
     public function desativarUsuario($id)
     {
         $usuario = Usuario::find($id);
-        if (!$usuario) {
+        if (!$usuario || $usuario->permissao == 'Administrador') {
             return response()->json([
                 'error' => true,
                 'message' => 'Usuário não encontrado.'
@@ -278,7 +321,7 @@ class UsuarioController extends Controller
     public function ativarUsuario($id)
     {
         $usuario = Usuario::find($id);
-        if (!$usuario) {
+        if (!$usuario || $usuario->permissao == 'Administrador') {
             return response()->json([
                 'error' => true,
                 'message' => 'Usuário não encontrado.'
@@ -301,6 +344,13 @@ class UsuarioController extends Controller
      */
     public function visualizarUsuariosPorPermissao($permissao)
     {
+        if($permissao == 'Administrador'){
+            return response()->json([
+                'error' => true,
+                'message' => 'Nenhum usuário encontrado.'
+            ], 404);
+        }
+
         $usuarios = Usuario::where('status_usuario', 'Ativo')->where('permissao', $permissao)->get();
 
         if (!$usuarios) {
@@ -322,7 +372,9 @@ class UsuarioController extends Controller
      */
     public function visualizarUsuariosAtivos()
     {
-        $usuarios = Usuario::where('status_usuario', 'Ativo')->get();
+    
+
+        $usuarios = Usuario::where('status_usuario', 'Ativo')->where('permissao', '!=', 'Administrador')->get();
 
         if (!$usuarios) {
             return response()->json([
@@ -343,7 +395,7 @@ class UsuarioController extends Controller
      */
     public function visualizarUsuariosInativos()
     {
-        $usuarios = Usuario::where('status_usuario', 'Inativo')->get();
+        $usuarios = Usuario::where('status_usuario', 'Inativo')->wherwe('permissao', '!=', 'Administrador')->get();
 
         if (!$usuarios) {
             return response()->json([
