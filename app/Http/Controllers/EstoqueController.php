@@ -205,5 +205,46 @@ class EstoqueController extends Controller
         ], 200);
     }
 
+    /**
+     * Listar estoque ativos
+     */
+    public function listarEstoquesAtivos()
+    {
+        $estoque = Estoque::where('status_estoque', 'Ativo')->get();
+
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Estoque nao encontrado.'
+            ], 404);
+        }
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoque encontrado.',
+            'estoque' => $estoque
+        ], 200);
+    }
     
+
+    /**
+     * Listar estoque inativo
+     */
+    public function listarEstoquesInativos()
+    {
+        $estoque = Estoque::where('status_estoque', 'Inativo')->get();
+
+        if (!$estoque) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Estoque nao encontrado.'
+            ], 404);
+        }
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Estoque encontrado.',
+            'estoque' => $estoque
+        ], 200);
+    }
 }
