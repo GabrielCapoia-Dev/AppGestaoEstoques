@@ -16,6 +16,13 @@ class PermissaoMiddleware
      */
     public function handle(Request $request, Closure $next, $permissao)
     {
+        if(!$permissao){
+            return response()->json([
+                'error' => true,
+                'message' => 'Permissão não informada'
+            ], 400);
+        }
+
         $usuario = JWTAuth::parseToken()->authenticate();
 
         $grupoPermissoes = explode('|', $permissao);

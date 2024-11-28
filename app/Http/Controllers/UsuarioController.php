@@ -6,50 +6,46 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UsuarioController extends Controller
 {
 
-    /**
-     * Realiza o login e athentica o usuário com base na sua permissao
-     * se a permissao for admin, o usuário é redirecionado para a pagina de administrador
+        /**
+     * Verifica se o email passado na request existe no banco
+     * apos verificado compara a password do banco com a password da
+     * request, se todos os valores estiverem certos gera o token
      */
     public function login(Request $request)
     {
 
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'email_usuario' => 'required|email',
-                'senha' => 'required|string|min:7'
-            ],
-            [
-                'required' => 'O campo :attribute é obrigatório.',
-                'email' => 'O campo :attribute deve ser um e-mail.',
-            ],
-            [
-                'email_usuario' => 'E-mail',
-                'senha' => 'Senha'
-            ]
-        );
+        // Validação dos dados recebidos
+        $request->validate([
+            'email_usuario' => 'required|email',
+            'senha' => 'required',
+        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => true,
-                'message' => $validator->errors()->first()
-            ], 400);
-        }
-
-
-
+        // Busca o usuário pelo e-mail
         $usuario = Usuario::where('email_usuario', $request->email_usuario)->first();
 
-        if (!$usuario || !Hash::check($request->senha, $usuario->password)) {
+        // Verifica se o usuário existe e se a senha está correta
+        if (!$usuario || !Hash::check($request->senha, $usuario->senha)) {
             return response()->json([
                 'error' => true,
-                'message' => 'Credenciais inválidas.'
+                'message' => 'Credenciais inválidas'
             ], 401);
         }
+
+        // Gera o token JWT
+        $token = JWTAuth::fromUser($usuario);
+
+        // Retorna o token e os dados do usuário
+        return response()->json([
+            'error' => false,
+            'message' => 'Login realizado com sucesso',
+            'accessToken' => $token,
+            'usuario' => $usuario
+        ], 200);
     }
 
     /**

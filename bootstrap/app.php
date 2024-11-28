@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->throttleApi();
 
         $middleware->alias([
-            'auth.jwt' => \App\Http\Middleware\PermissaoMiddleware::class,
+            'permissao' => \App\Http\Middleware\PermissaoMiddleware::class,    // Registra a middleware de permissão personalizada
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
